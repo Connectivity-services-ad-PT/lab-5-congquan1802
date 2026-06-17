@@ -36,7 +36,9 @@ jobs:
 
       # 5. Build & start stack, đợi healthcheck pass (--wait)
       - name: Build and start Compose stack
-        run: docker compose up -d --build --wait
+        run: |
+          docker network create class-net || true
+          docker compose up -d --build --wait
 
       - name: Show running containers
         run: docker compose ps
