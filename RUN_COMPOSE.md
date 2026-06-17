@@ -7,8 +7,8 @@ Tài liệu này hướng dẫn người khác clone repo sạch và chạy lạ
 ## 1. Clone repo
 
 ```bash
-git clone <repo-url>
-cd FIT4110_lab05_docker_compose_readiness
+git clone https://github.com/Connectivity-services-ad-PT/lab-5-congquan1802.git
+cd lab-5-congquan1802
 ```
 
 ---

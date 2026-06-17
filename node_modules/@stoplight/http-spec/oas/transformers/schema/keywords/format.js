@@ -1,0 +1,58 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const utils_1 = require("../../../../utils");
+const ranges = {
+    MIN_INT_32: 0 - 2 ** 31,
+    MAX_INT_32: 2 ** 31 - 1,
+    MIN_INT_64: Number.MIN_SAFE_INTEGER,
+    MAX_INT_64: Number.MAX_SAFE_INTEGER,
+    MIN_FLOAT: 0 - 2 ** 128,
+    MAX_FLOAT: 2 ** 128 - 1,
+    MIN_DOUBLE: 0 - Number.MAX_VALUE,
+    MAX_DOUBLE: Number.MAX_VALUE,
+};
+const createNumberFormatter = (min, max) => {
+    return schema => {
+        const explicitProperties = (0, utils_1.collectExplicitProperties)(schema);
+        schema['x-stoplight'] = { ...schema['x-stoplight'], explicitProperties };
+        schema.minimum = Math.max(asActualNumber(schema.minimum, min), min);
+        schema.maximum = Math.min(asActualNumber(schema.maximum, max), max);
+    };
+};
+const convertFormatInt32 = createNumberFormatter(ranges.MIN_INT_32, ranges.MAX_INT_32);
+const convertFormatInt64 = createNumberFormatter(ranges.MIN_INT_64, ranges.MAX_INT_64);
+const convertFormatFloat = createNumberFormatter(ranges.MIN_FLOAT, ranges.MAX_FLOAT);
+const convertFormatDouble = createNumberFormatter(ranges.MIN_DOUBLE, ranges.MAX_DOUBLE);
+const convertFormatByte = schema => {
+    const explicitProperties = (0, utils_1.collectExplicitProperties)(schema);
+    schema['x-stoplight'] = { ...schema['x-stoplight'], explicitProperties };
+    schema.pattern = '^[\\w\\d+\\/=]*$';
+};
+const convertFormatBase64 = schema => {
+    schema.contentEncoding = 'base64';
+    delete schema.format;
+};
+const convertFormatBinary = schema => {
+    schema.contentMediaType = 'application/octet-stream';
+    delete schema.format;
+};
+function asActualNumber(maybeNumber, defaultValue) {
+    const number = Number(maybeNumber);
+    return Number.isNaN(number) ? defaultValue : number;
+}
+const formatConverters = {
+    int32: convertFormatInt32,
+    int64: convertFormatInt64,
+    float: convertFormatFloat,
+    double: convertFormatDouble,
+    byte: convertFormatByte,
+    base64: convertFormatBase64,
+    binary: convertFormatBinary,
+};
+const format = schema => {
+    if (typeof schema.format === 'string' && schema.format in formatConverters) {
+        formatConverters[schema.format](schema);
+    }
+};
+exports.default = { format };
+//# sourceMappingURL=format.js.map

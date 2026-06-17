@@ -1,0 +1,28 @@
+{
+  "name": "@stoplight/prism-core",
+  "version": "5.8.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Stoplight <support@stoplight.io>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stoplightio/prism.git"
+  },
+  "files": [
+    "/dist"
+  ],
+  "engines": {
+    "node": ">=18.20.1"
+  },
+  "dependencies": {
+    "fp-ts": "^2.11.5",
+    "lodash": "^4.17.21",
+    "pino": "^6.13.3",
+    "tslib": "^2.3.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "fdff50f505a216b2fb1fa1322dd17005a0e39340"
+}

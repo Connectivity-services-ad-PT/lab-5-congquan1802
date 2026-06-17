@@ -1,0 +1,53 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.transformResponse = void 0;
+const types_1 = require("@stoplight/types");
+const id_1 = require("../id");
+const util_1 = require("../util");
+const params_1 = require("./params");
+function transformResponse(response) {
+    const headers = response.headers.map(params_1.transformHeader);
+    const mediaType = response.headers.get('content-type');
+    return {
+        id: (0, id_1.generateId)(),
+        code: String(response.code),
+        description: response.description && (0, util_1.transformDescriptionDefinition)(response.description),
+        headers: headers.concat(response.cookies.map(transformCookie).filter((c) => c)),
+        contents: mediaType && response.body ? [(0, params_1.transformRawBody)(response.body, mediaType)] : undefined,
+    };
+}
+exports.transformResponse = transformResponse;
+function transformCookie(cookie) {
+    const params = [`${cookie.name || ''}=${cookie.value || ''}`];
+    const expires = cookie.expires;
+    if (expires)
+        params.push(`Expires=${(isDate(expires) ? expires : new Date(expires * 1000)).toUTCString()}`);
+    if (cookie.maxAge !== undefined)
+        params.push(`Max-Age=${cookie.maxAge}`);
+    if (cookie.domain)
+        params.push(`Domain=${cookie.domain}`);
+    if (cookie.path)
+        params.push(`Path=${cookie.path}`);
+    if (cookie.secure)
+        params.push(`Secure`);
+    if (cookie.httpOnly)
+        params.push(`HttpOnly`);
+    if (cookie.extensions)
+        params.push(...cookie.extensions.map(({ key, value }) => `${key}=${value}`));
+    return {
+        id: (0, id_1.generateId)(),
+        name: 'set-cookie',
+        examples: [
+            {
+                id: (0, id_1.generateId)(),
+                key: 'default',
+                value: params.join('; '),
+            },
+        ],
+        style: types_1.HttpParamStyles.Simple,
+    };
+}
+function isDate(date) {
+    return date instanceof Date;
+}
+//# sourceMappingURL=response.js.map

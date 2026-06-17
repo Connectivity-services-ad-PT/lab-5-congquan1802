@@ -1,0 +1,36 @@
+{
+  "name": "@stoplight/prism-http-server",
+  "version": "5.12.2",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Stoplight <support@stoplight.io>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stoplightio/prism.git"
+  },
+  "engines": {
+    "node": ">=18.20.1"
+  },
+  "files": [
+    "/dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@stoplight/prism-core": "^5.8.0",
+    "@stoplight/prism-http": "^5.12.0",
+    "@stoplight/types": "^14.1.0",
+    "fast-xml-parser": "^4.2.0",
+    "fp-ts": "^2.11.5",
+    "io-ts": "^2.2.16",
+    "lodash": "^4.17.21",
+    "micri": "^4.3.0",
+    "node-fetch": "^2.6.5",
+    "parse-prefer-header": "1.0.0",
+    "tslib": "^2.3.1",
+    "type-is": "^1.6.18"
+  },
+  "gitHead": "e12e766a21384a38a7d143d79c441cf287888551"
+}

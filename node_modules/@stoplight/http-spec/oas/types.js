@@ -1,0 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OasVersion = void 0;
+var OasVersion;
+(function (OasVersion) {
+    OasVersion[OasVersion["OAS2"] = 2] = "OAS2";
+    OasVersion[OasVersion["OAS3"] = 3] = "OAS3";
+})(OasVersion = exports.OasVersion || (exports.OasVersion = {}));
+//# sourceMappingURL=types.js.map

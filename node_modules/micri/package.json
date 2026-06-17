@@ -1,0 +1,71 @@
+{
+  "name": "micri",
+  "version": "4.5.1",
+  "description": "Asynchronous HTTP microservices",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf ./dist && ncc build -m -s ./src/index.ts && cp ./lib/worker-wrapper.js ./dist/",
+    "test": "npm run lint && NODE_ENV=test jest",
+    "lint": "eslint --ext .ts ./src",
+    "git-pre-commit": "eslint --ext .ts ./src",
+    "prepublish": "npm run build",
+    "prettier": "prettier --write './{src,test}/**/*.ts' && prettier --write './lib/*.js'"
+  },
+  "engines": {
+    "node": ">= 12.0.0"
+  },
+  "repository": "turist-cloud/micri",
+  "keywords": [
+    "micro",
+    "micri",
+    "service",
+    "microservice",
+    "API"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bytes": "3.1.0",
+    "@types/content-type": "1.1.3",
+    "@types/jest": "28.1.4",
+    "@types/node": "13.9.1",
+    "@types/test-listen": "1.1.0",
+    "@typescript-eslint/eslint-plugin": "5.30.5",
+    "@typescript-eslint/parser": "5.30.5",
+    "@vercel/ncc": "0.34.0",
+    "@zeit/fetch-retry": "4.0.1",
+    "@zeit/git-hooks": "0.1.4",
+    "bytes": "3.1.2",
+    "content-type": "1.0.4",
+    "eslint": "8.19.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-prettier": "4.2.1",
+    "jest": "28.1.2",
+    "node-fetch": "2.6.7",
+    "prettier": "2.7.1",
+    "raw-body": "2.5.1",
+    "resumer": "0.0.0",
+    "test-listen": "1.1.0",
+    "ts-jest": "28.0.5",
+    "typescript": "4.7.4"
+  },
+  "dependencies": {
+    "handler-agent": "0.2.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testMatch": [
+      "**/test/**/*.test.ts"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/*.ts"
+    ],
+    "verbose": true
+  },
+  "git": {
+    "pre-commit": "lint-staged"
+  }
+}
