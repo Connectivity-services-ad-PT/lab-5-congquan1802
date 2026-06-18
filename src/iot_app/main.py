@@ -198,6 +198,8 @@ def health() -> HealthResponse:
     )
 
 
+EVENTS: List[Dict] = []
+
 @app.post(
     "/api/v1/events/{event_type}",
     status_code=status.HTTP_201_CREATED,
@@ -209,7 +211,20 @@ def health() -> HealthResponse:
 )
 def ingest_events(event_type: str, payload: dict) -> dict:
     """Nhận sự kiện (event) từ các service khác (Gate, IoT, Camera, Business)."""
-    return {"status": "accepted", "event_type": event_type}
+    event_data = {
+        "event_id": next_reading_id().replace("R-", "E-"),
+        "event_type": event_type,
+        "payload": payload,
+        "received_at": now_iso()
+    }
+    EVENTS.append(event_data)
+    return {"status": "accepted", "event_type": event_type, "event_id": event_data["event_id"]}
+
+@app.get("/api/v1/events/{event_type}", dependencies=[Depends(verify_bearer_token)])
+def get_events(event_type: str) -> Dict[str, List[Dict]]:
+    """Lấy danh sách các sự kiện đã nhận theo loại (Gate, IoT, Camera, Business)."""
+    items = [item for item in EVENTS if item["event_type"] == event_type]
+    return {"items": items}
 
 
 @app.post(
