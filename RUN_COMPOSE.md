@@ -33,8 +33,8 @@ docker compose up -d --build
 
 Lệnh trên sẽ tạo các container:
 
-- `fit4110-db-lab05` (PostgreSQL)
-- `fit4110-ai-lab05` (AI service mẫu chạy port 9000)
+- `fit4110-db-lab05` (TimescaleDB)
+- `fit4110-analytics-lab05` (Analytics service mẫu chạy port 9000)
 - `fit4110-api-lab05` (API FastAPI trên port 8000)
 
 Theo dõi log:
@@ -49,17 +49,17 @@ Sau vài giây, kiểm tra health của mỗi service:
 # API
 curl http://localhost:8000/health
 
-# AI service
+# Analytics service
 curl http://localhost:9000/health
 
 # DB readiness
 docker exec -it fit4110-db-lab05 pg_isready -U $POSTGRES_USER
 ```
 
-Bạn cũng có thể truy cập endpoint `/predict` của AI service để xem kết quả mẫu:
+Bạn cũng có thể truy cập endpoint `/stats` của Analytics service để xem kết quả mẫu:
 
 ```bash
-curl -X POST http://localhost:9000/predict
+curl -X GET http://localhost:9000/stats
 ```
 
 ---
@@ -111,4 +111,4 @@ make logs
 
 - Sử dụng `docker compose ps` để xem trạng thái container.
 - Nếu API trả lỗi kết nối DB, hãy kiểm tra biến môi trường `POSTGRES_*` trong `.env` và đảm bảo DB đã sẵn sàng (`pg_isready`).
-- Nếu AI service cần tải mô hình lớn, tăng `start_period` của healthcheck trong `docker-compose.yml`.
+- Nếu analytics service cần khởi động lâu, tăng `start_period` của healthcheck trong `docker-compose.yml`.

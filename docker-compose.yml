@@ -12,7 +12,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      ai-service:
+      analytics-service:
         condition: service_healthy
     networks:
       - team-internal
@@ -26,9 +26,9 @@ services:
       retries: 3
       start_period: 10s
 
-  # PostgreSQL database service
+  # PostgreSQL database service (TimescaleDB for team-analytics)
   db:
-    image: postgres:15-alpine
+    image: timescale/timescaledb:latest-pg15
     container_name: fit4110-db-lab05
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-lab05}
@@ -44,14 +44,14 @@ services:
       timeout: 5s
       retries: 5
 
-  # AI service mẫu dùng Python HTTP server hoặc FastAPI
-  ai-service:
+  # Analytics service
+  analytics-service:
     image: python:3.11-slim
-    container_name: fit4110-ai-lab05
+    container_name: fit4110-analytics-lab05
     working_dir: /service
     volumes:
-      - ./src/ai_service:/service
-    command: ["sh", "-c", "pip install --quiet fastapi uvicorn && python main.py"]
+      - ./src/analytics_service:/service
+    command: ["sh", "-c", "pip install --quiet fastapi uvicorn pydantic && python main.py"]
     ports:
       - "9000:9000"
     networks:

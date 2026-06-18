@@ -1,0 +1,777 @@
+openapi: 3.1.0
+
+info:
+  title: Smart Campus Analytics Service API
+  version: 1.0.0
+  description: |
+    API contract cho Analytics Service trong hệ thống Smart Campus.
+
+    Analytics Service nhận dữ liệu async event từ:
+    - IoT Ingestion
+    - Camera Stream
+    - Core Business
+    - Access Gate
+
+    Dữ liệu được dùng để:
+    - aggregate KPI
+    - realtime analytics
+    - anomaly detection
+    - dashboard monitoring
+
+  contact:
+    name: Trần Công Quân
+    email: congquan@example.com
+
+servers:
+  - url: http://localhost:4010
+    description: Prism mock server
+
+  - url: https://api.analytics.local
+    description: Analytics service server
+
+tags:
+  - name: health
+    description: Kiểm tra trạng thái service
+
+  - name: analytics
+    description: API analytics/report/dashboard
+
+  - name: events
+    description: API nhận event từ các service khác
+
+security:
+  - bearerAuth: []
+
+paths:
+
+  /health:
+    get:
+      operationId: getHealth
+      summary: Kiểm tra trạng thái service
+      description: Endpoint kiểm tra Analytics Service hoạt động.
+      tags:
+        - health
+
+      security: []
+
+      responses:
+        '200':
+          description: Service hoạt động bình thường
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+  /analytics/iot-events:
+    post:
+      operationId: ingestIoTEvent
+      summary: Nhận IoT telemetry event
+      description: |
+        Nhận event từ IoT Ingestion.
+
+        Event hỗ trợ:
+        - telemetry.ingested
+        - device.status.changed
+
+      tags:
+        - events
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IoTEvent'
+
+      responses:
+        '201':
+          description: Event đã được ghi nhận
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /analytics/camera-events:
+    post:
+      operationId: ingestCameraEvent
+      summary: Nhận camera event
+      description: |
+        Nhận event từ Camera Stream.
+
+        Event hỗ trợ:
+        - camera.motion.detected
+        - camera.frame.analyzed
+        - camera.status.changed
+
+      tags:
+        - events
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CameraEvent'
+
+      responses:
+        '201':
+          description: Camera event đã được ghi nhận
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /analytics/business-events:
+    post:
+      operationId: ingestBusinessEvent
+      summary: Nhận business event
+      description: |
+        Nhận event từ Core Business.
+
+        Event hỗ trợ:
+        - policy.decision.created
+        - alert.created
+        - alert.resolved
+        - anomaly.confirmed
+
+      tags:
+        - events
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessEvent'
+
+      responses:
+        '201':
+          description: Business event đã được ghi nhận
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /analytics/access-events:
+    post:
+      operationId: ingestAccessEvent
+      summary: Nhận access event
+      description: |
+        Nhận event từ Access Gate.
+
+        Event hỗ trợ:
+        - access.log.created
+        - access.denied
+
+      tags:
+        - events
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessEvent'
+
+      responses:
+        '201':
+          description: Access event đã được ghi nhận
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /analytics/report/{id}:
+    get:
+      operationId: getAnalyticsReport
+      summary: Lấy analytics report
+      description: Trả về kết quả phân tích analytics.
+      tags:
+        - analytics
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID analytics report
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        '200':
+          description: Analytics result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResult'
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /analytics/events:
+    get:
+      operationId: listAnalyticsEvents
+      summary: Lấy danh sách analytics event
+      description: Trả về danh sách analytics event.
+      tags:
+        - analytics
+
+      responses:
+        '200':
+          description: Danh sách analytics event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsPage'
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /analytics/kpi:
+    get:
+      operationId: getKPIStatistics
+      summary: Lấy KPI statistics
+      description: Trả về KPI vận hành hệ thống.
+      tags:
+        - analytics
+
+      responses:
+        '200':
+          description: KPI statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KPIStatistic'
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /analytics/dashboard:
+    get:
+      operationId: getDashboardMetrics
+      summary: Lấy dashboard metrics
+      description: Trả về dashboard realtime metrics.
+      tags:
+        - analytics
+
+      responses:
+        '200':
+          description: Dashboard metrics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DashboardMetric'
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    HealthStatus:
+      type: object
+      additionalProperties: false
+
+      required:
+        - status
+        - service
+        - time
+
+      properties:
+
+        status:
+          type: string
+          example: ok
+
+        service:
+          type: string
+          example: analytics-service
+
+        time:
+          type: string
+          format: date-time
+
+    IoTEvent:
+      type: object
+      additionalProperties: false
+
+      required:
+        - deviceId
+        - timestamp
+
+      properties:
+
+        deviceId:
+          type: string
+          example: SENSOR-001
+
+        metric:
+          type: string
+          example: temperature
+
+        value:
+          type: number
+          example: 38.5
+
+        timestamp:
+          type: string
+          format: date-time
+
+    CameraEvent:
+      type: object
+      additionalProperties: false
+
+      required:
+        - eventType
+        - cameraId
+        - timestamp
+        - correlationId
+
+      properties:
+
+        eventType:
+          type: string
+          example: camera.motion.detected
+
+        cameraId:
+          type: string
+          example: CAM-001
+
+        detectionId:
+          type: string
+          format: uuid
+
+        confidenceScore:
+          type: number
+          example: 0.94
+
+        severity:
+          type: string
+          enum:
+            - LOW
+            - MEDIUM
+            - HIGH
+
+        imageRef:
+          type: string
+          format: uri
+
+        timestamp:
+          type: string
+          format: date-time
+
+        correlationId:
+          type: string
+          format: uuid
+
+    BusinessEvent:
+      type: object
+      additionalProperties: false
+
+      required:
+        - eventType
+        - decisionId
+        - timestamp
+        - correlationId
+
+      properties:
+
+        eventType:
+          type: string
+          example: policy.decision.created
+
+        sourceModule:
+          type: string
+          example: policy-engine
+
+        decisionId:
+          type: string
+          format: uuid
+
+        policyId:
+          type: string
+
+        subjectId:
+          type: string
+
+        result:
+          type: string
+          enum:
+            - ALLOW
+            - DENY
+            - REVIEW
+            - ESCALATE
+
+        severity:
+          type: string
+          enum:
+            - LOW
+            - MEDIUM
+            - HIGH
+            - CRITICAL
+
+        riskScore:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 82
+
+        analyticsRequired:
+          type: boolean
+          example: true
+
+        notificationRequired:
+          type: boolean
+          example: true
+
+        reason:
+          type: string
+
+        timestamp:
+          type: string
+          format: date-time
+
+        correlationId:
+          type: string
+          format: uuid
+
+    AccessEvent:
+      type: object
+      additionalProperties: false
+
+      required:
+        - eventType
+        - gateId
+        - direction
+        - timestamp
+        - correlationId
+
+      properties:
+
+        eventType:
+          type: string
+          example: access.log.created
+
+        gateId:
+          type: string
+          example: GATE-01
+
+        direction:
+          type: string
+          enum:
+            - IN
+            - OUT
+
+        cardIdHash:
+          type: string
+
+        decision:
+          type: string
+          enum:
+            - ALLOW
+            - DENY
+
+        timestamp:
+          type: string
+          format: date-time
+
+        correlationId:
+          type: string
+          format: uuid
+
+    AnalyticsResult:
+      type: object
+      additionalProperties: false
+
+      required:
+        - analyticsId
+        - resultType
+        - sourceService
+        - generatedAt
+
+      properties:
+
+        analyticsId:
+          type: string
+          format: uuid
+
+        resultType:
+          type: string
+          example: ANOMALY_DETECTED
+
+        sourceService:
+          type: string
+          example: camera-service
+
+        severity:
+          type: string
+          enum:
+            - LOW
+            - MEDIUM
+            - HIGH
+            - CRITICAL
+
+        confidenceScore:
+          type: number
+          example: 0.95
+
+        description:
+          type: string
+
+        generatedAt:
+          type: string
+          format: date-time
+
+        correlationId:
+          type: string
+          format: uuid
+
+        metadata:
+          type: object
+
+    KPIStatistic:
+      type: object
+      additionalProperties: false
+
+      required:
+        - kpiId
+        - metricName
+        - value
+        - unit
+        - calculatedAt
+
+      properties:
+
+        kpiId:
+          type: string
+          format: uuid
+
+        metricName:
+          type: string
+          example: access-deny-rate
+
+        value:
+          type: number
+          example: 15.4
+
+        unit:
+          type: string
+          example: percentage
+
+        trend:
+          type: string
+          enum:
+            - UP
+            - DOWN
+            - STABLE
+
+        calculatedAt:
+          type: string
+          format: date-time
+
+        description:
+          type: string
+
+    DashboardMetric:
+      type: object
+      additionalProperties: false
+
+      properties:
+
+        metricName:
+          type: string
+          example: active-devices
+
+        currentValue:
+          type: number
+          example: 128
+
+        trend:
+          type: string
+          enum:
+            - UP
+            - DOWN
+            - STABLE
+
+        updatedAt:
+          type: string
+          format: date-time
+
+    AnalyticsPage:
+      type: object
+      additionalProperties: false
+
+      required:
+        - items
+        - total
+        - page
+        - pageSize
+
+      properties:
+
+        items:
+          type: array
+
+          items:
+            $ref: '#/components/schemas/AnalyticsResult'
+
+        total:
+          type: integer
+          example: 100
+
+        page:
+          type: integer
+          example: 1
+
+        pageSize:
+          type: integer
+          example: 10
+
+    Problem:
+      type: object
+      additionalProperties: false
+
+      required:
+        - type
+        - title
+        - status
+
+      properties:
+
+        type:
+          type: string
+          format: uri
+
+        title:
+          type: string
+
+        status:
+          type: integer
+
+        detail:
+          type: string
+
+        instance:
+          type: string
+          format: uri
+
+  responses:
+
+    BadRequest:
+      description: Payload sai định dạng
+
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    Unauthorized:
+      description: Thiếu Bearer token
+
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    NotFound:
+      description: Resource không tồn tại
+
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    Conflict:
+      description: Trùng event hoặc retry gây xử lý lặp
+
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    UnprocessableEntity:
+      description: Payload đúng JSON nhưng sai nghiệp vụ
+
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    InternalServerError:
+      description: Lỗi hệ thống phía Analytics
+
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
