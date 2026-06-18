@@ -199,6 +199,20 @@ def health() -> HealthResponse:
 
 
 @app.post(
+    "/api/v1/events/{event_type}",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_bearer_token)],
+    responses={
+        401: {"model": ProblemDetails},
+        422: {"model": ProblemDetails},
+    },
+)
+def ingest_events(event_type: str, payload: dict) -> dict:
+    """Nhận sự kiện (event) từ các service khác (Gate, IoT, Camera, Business)."""
+    return {"status": "accepted", "event_type": event_type}
+
+
+@app.post(
     "/readings",
     response_model=SensorReadingCreated,
     status_code=status.HTTP_201_CREATED,

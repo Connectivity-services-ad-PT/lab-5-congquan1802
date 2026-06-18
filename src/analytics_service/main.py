@@ -46,12 +46,6 @@ def get_stats() -> Stats:
     )
 
 
-@app.post("/api/v1/events/{event_type}")
-def ingest_events(event_type: str, payload: dict) -> dict:
-    # Dummy endpoint to accept events from gate, iot, etc.
-    return {"status": "accepted", "event_type": event_type}
-
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=9000)
