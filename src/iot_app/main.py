@@ -1,5 +1,6 @@
 import os
 import http.client
+import requests as http_requests
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Optional
@@ -13,6 +14,7 @@ from pydantic import BaseModel, Field
 SERVICE_NAME = os.getenv("SERVICE_NAME", "iot-ingestion")
 SERVICE_VERSION = os.getenv("SERVICE_VERSION", "0.5.0")
 AUTH_TOKEN = os.getenv("AUTH_TOKEN", "local-dev-token")
+CORE_SERVICE_URL = os.getenv("CORE_SERVICE_URL", "")
 
 
 app = FastAPI(
@@ -218,7 +220,29 @@ def ingest_events(event_type: str, payload: dict) -> dict:
         "received_at": now_iso()
     }
     EVENTS.append(event_data)
-    return {"status": "accepted", "event_type": event_type, "event_id": event_data["event_id"]}
+
+    # Forward event sang nhóm Core nếu có cấu hình CORE_SERVICE_URL
+    if CORE_SERVICE_URL:
+        core_path = f"/api/v1/{event_type}-events"
+        try:
+            resp = http_requests.post(
+                f"{CORE_SERVICE_URL}{core_path}",
+                json=payload,
+                headers={"Authorization": f"Bearer {AUTH_TOKEN}"},
+                timeout=3,
+            )
+            forward_status = resp.status_code
+        except Exception as e:
+            forward_status = f"error: {e}"
+    else:
+        forward_status = "skipped (no CORE_SERVICE_URL)"
+
+    return {
+        "status": "accepted",
+        "event_type": event_type,
+        "event_id": event_data["event_id"],
+        "forwarded_to_core": forward_status,
+    }
 
 @app.get("/api/v1/events/{event_type}", dependencies=[Depends(verify_bearer_token)])
 def get_events(event_type: str) -> Dict[str, List[Dict]]:
