@@ -1,0 +1,9 @@
+{
+  "eventType": "access.log.created",
+  "gateId": "GATE-01",
+  "direction": "IN",
+  "cardIdHash": "abc123hash",
+  "decision": "ALLOW",
+  "timestamp": "2026-06-18T10:00:00+07:00",
+  "correlationId": "550e8400-e29b-41d4-a716-446655440000"
+}
